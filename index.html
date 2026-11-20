@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mecánica en el día a día</title>
+  <meta name="description" content="Aprende las leyes de Newton jugando: 4 niveles cortos con ejemplos de todos los días.">
+  <style>
+/* =====================================================
+   Mecánica en el día a día — estilos
+   Pensado primero para celular (mobile first)
+   ===================================================== */
+
+:root {
+  --fondo: #f1f5fb;
+  --tarjeta: #ffffff;
+  --texto: #1f2a3c;
+  --suave: #5b6b82;
+  --linea: #dde5f0;
+  --primario: #2f6fed;
+  --primario-oscuro: #1f56c4;
+  --acento: #ffb703;
+  --bien: #2b9a57;
+  --bien-fondo: #e4f6ec;
+  --mal: #d64545;
+  --mal-fondo: #fdecec;
+  --pista-fondo: #fff6d6;
+  --radio: 18px;
+  --sombra: 0 4px 18px rgba(31, 42, 60, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+/* ---------- Barra superior y progreso ---------- */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--tarjeta);
+  border-bottom: 1px solid var(--linea);
+}
+.marca { font-weight: 700; font-size: 0.95rem; }
+.progreso { display: flex; gap: 8px; }
+.punto {
+  width: 30px; height: 10px; border-radius: 6px;
+  background: var(--linea);
+  transition: background 0.3s;
+}
+.punto.actual { background: var(--acento); }
+.punto.hecho { background: var(--bien); }
+
+/* ---------- Contenedor y pantallas ---------- */
+#app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.pantalla { display: none; }
+.pantalla.activa { display: block; animation: aparecer 0.35s ease; }
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.tarjeta {
+  background: var(--tarjeta);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 8px; }
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.2rem; }
+
+.etiqueta {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primario);
+}
+.tema { margin: 0 0 10px; color: var(--suave); font-size: 0.95rem; }
+.texto-corto {
+  margin: 0;
+  padding: 12px 14px;
+  background: #eef4ff;
+  border-left: 5px solid var(--primario);
+  border-radius: 10px;
+  font-size: 1.1rem;
+}
+
+/* ---------- Inicio ---------- */
+.inicio { text-align: center; padding: 28px 18px; }
+.gran-emoji { font-size: 2.4rem; margin: 0 0 8px; letter-spacing: 6px; }
+.subtitulo { color: var(--suave); font-size: 1.1rem; margin: 0 0 14px; }
+.reglas {
+  text-align: left;
+  margin: 0 auto 22px;
+  padding-left: 22px;
+  max-width: 460px;
+  color: var(--texto);
+}
+.reglas li { margin-bottom: 6px; }
+
+/* ---------- Botones ---------- */
+.btn {
+  appearance: none;
+  border: 2px solid var(--primario);
+  background: #fff;
+  color: var(--primario);
+  font: inherit;
+  font-weight: 700;
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.08s, background 0.15s, color 0.15s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:hover:not(:disabled) { background: #eaf1ff; }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.principal { background: var(--primario); color: #fff; }
+.btn.principal:hover:not(:disabled) { background: var(--primario-oscuro); }
+.btn.alerta { border-color: var(--mal); color: var(--mal); }
+.btn.alerta:hover:not(:disabled) { background: var(--mal-fondo); }
+.btn.grande { font-size: 1.15rem; min-height: 56px; padding: 12px 34px; }
+.btn:focus-visible, .chip:focus-visible, .opcion:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.chip {
+  appearance: none;
+  border: 2px solid var(--linea);
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.chip.activo { border-color: var(--primario); background: #eaf1ff; color: var(--primario); }
+
+/* ---------- Escenario y controles ---------- */
+.escenario {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #e9f0fa;
+}
+.escenario svg { display: block; width: 100%; height: auto; }
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+.controles .grupo { display: flex; flex-wrap: wrap; gap: 8px; }
+.controles .mini { flex-basis: 100%; margin: 0; color: var(--suave); font-size: 0.95rem; min-height: 1.4em; }
+.deslizador {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 200px; flex: 1 1 200px;
+  font-weight: 600; font-size: 0.95rem;
+}
+.deslizador input[type="range"] { width: 100%; height: 36px; accent-color: var(--primario); }
+
+.aviso { margin: 4px 0 12px; font-size: 0.95rem; color: var(--suave); min-height: 1.4em; }
+
+/* ---------- Nivel 4: teléfono ---------- */
+.escena-telefono {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px;
+}
+.telefono {
+  width: 220px;
+  height: 340px;
+  border: 9px solid #1f2a3c;
+  border-radius: 32px;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 22px rgba(31, 42, 60, 0.25);
+}
+.telefono::before {
+  content: "";
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 70px; height: 14px; background: #1f2a3c;
+  border-radius: 0 0 12px 12px; z-index: 2;
+}
+.lista-ventana {
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.lista-ventana:active { cursor: grabbing; }
+.lista { will-change: transform; padding-top: 18px; }
+.item {
+  display: flex; align-items: center; gap: 10px;
+  height: 56px; padding: 0 12px;
+  border-bottom: 1px solid var(--linea);
+}
+.item .avatar {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 1.1rem;
+  background: #eaf1ff;
+}
+.item b { display: block; font-size: 0.92rem; line-height: 1.2; }
+.item small { color: var(--suave); font-size: 0.78rem; }
+
+.medidor { width: 180px; font-size: 0.9rem; font-weight: 600; }
+.medidor .fondo-v {
+  margin-top: 6px; height: 14px; border-radius: 8px;
+  background: var(--linea); overflow: hidden;
+}
+.medidor .fondo-v div { height: 100%; width: 0; background: var(--bien); }
+.medidor p { margin: 10px 0 0; font-weight: 400; color: var(--suave); }
+
+/* ---------- Pregunta ---------- */
+.pregunta h3 { font-size: 1.3rem; margin-bottom: 14px; }
+.opciones { display: grid; gap: 10px; }
+.opcion {
+  appearance: none;
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  min-height: 54px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 2px solid var(--linea);
+  background: #fff;
+  color: var(--texto);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.08s;
+}
+.opcion:hover:not(:disabled) { border-color: var(--primario); background: #f4f8ff; }
+.opcion:active:not(:disabled) { transform: scale(0.99); }
+.opcion.mal { border-color: var(--mal); background: var(--mal-fondo); color: var(--mal); opacity: 0.8; cursor: default; }
+.opcion.bien { border-color: var(--bien); background: var(--bien-fondo); color: var(--bien); cursor: default; }
+.opcion:disabled:not(.mal):not(.bien) { opacity: 0.55; cursor: default; }
+
+.mensaje { margin: 14px 0 0; }
+.mensaje:empty { display: none; }
+.mensaje .caja { padding: 12px 14px; border-radius: 12px; }
+.mensaje .pista { background: var(--pista-fondo); border: 1px solid #f0d36b; }
+.mensaje .ok { background: var(--bien-fondo); border: 1px solid #a9dcbf; }
+#btn-siguiente { margin-top: 14px; width: 100%; }
+#btn-pregunta { width: 100%; }
+
+/* ---------- Pantalla final ---------- */
+.final { text-align: center; padding: 26px 18px; }
+.final .gran-emoji { font-size: 3.2rem; letter-spacing: 0; }
+.puntaje { font-size: 1.5rem; font-weight: 800; color: var(--bien); margin: 4px 0; }
+.frase-final { margin: 0; color: var(--suave); }
+
+.tabla { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.95rem; }
+.tabla th, .tabla td {
+  padding: 10px 8px; text-align: left; vertical-align: top;
+  border-bottom: 1px solid var(--linea);
+}
+.tabla th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--suave); }
+.insignia {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: 0.85rem; font-weight: 700; white-space: nowrap;
+}
+.insignia.primera { background: var(--bien-fondo); color: var(--bien); }
+.insignia.pista { background: var(--pista-fondo); color: #8a6500; }
+
+@media (max-width: 640px) {
+  .tabla thead { display: none; }
+  .tabla tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .tabla td { display: block; border: 0; padding: 3px 0; }
+  .tabla td::before { content: attr(data-label) ": "; font-weight: 700; color: var(--suave); }
+}
+
+.repaso { padding-left: 20px; margin: 8px 0 14px; }
+.repaso li { margin-bottom: 8px; }
+.nota { font-size: 0.88rem; color: var(--suave); margin: 0 0 18px; }
+#btn-repetir { width: 100%; }
+
+/* ---------- Confeti ---------- */
+.confeti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.confeti span {
+  position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px;
+  animation: caer linear forwards;
+}
+@keyframes caer {
+  to { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla.activa { animation: none; }
+}
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding: 24px; }
+  .tarjeta { padding: 24px; }
+}
+
+</style>
+</head>
+<body>
+  <noscript>Este juego necesita JavaScript activado para funcionar.</noscript>
+
+  <header class="barra" id="barra" hidden>
+    <span class="marca">⚙️ Mecánica en el día a día</span>
+    <div class="progreso" id="progreso" aria-label="Progreso de los niveles"></div>
+  </header>
+
+  <main id="app">
+
+    <!-- ========== INICIO ========== -->
+    <section id="pantalla-inicio" class="pantalla activa">
+      <div class="tarjeta inicio">
+        <p class="gran-emoji" aria-hidden="true">🚌 🛒 🚤 📱</p>
+        <h1>Mecánica en el día a día</h1>
+        <p class="subtitulo">Aprende las leyes de Newton jugando.</p>
+        <ul class="reglas">
+          <li>4 niveles cortos, con ejemplos de todos los días.</li>
+          <li>Lees un texto corto, pruebas la actividad y respondes una pregunta fácil.</li>
+          <li>No se puede perder: si te equivocas, te damos una pista.</li>
+        </ul>
+        <button class="btn principal grande" id="btn-empezar">Empezar</button>
+      </div>
+    </section>
+
+    <!-- ========== NIVEL ========== -->
+    <section id="pantalla-nivel" class="pantalla">
+      <div class="tarjeta">
+        <p class="etiqueta" id="nivel-etiqueta"></p>
+        <h2 id="nivel-titulo"></h2>
+        <p class="tema" id="nivel-tema"></p>
+        <p class="texto-corto" id="nivel-texto"></p>
+      </div>
+
+      <div class="tarjeta">
+        <div class="escenario" id="escenario"></div>
+        <div class="controles" id="controles"></div>
+        <p class="aviso" id="aviso" aria-live="polite"></p>
+        <button class="btn principal" id="btn-pregunta" disabled>Ir a la pregunta</button>
+      </div>
+
+      <div class="tarjeta pregunta" id="bloque-pregunta" hidden>
+        <p class="etiqueta">Pregunta</p>
+        <h3 id="pregunta-texto"></h3>
+        <div class="opciones" id="opciones"></div>
+        <div class="mensaje" id="mensaje" aria-live="polite"></div>
+        <button class="btn principal" id="btn-siguiente" hidden>Siguiente nivel →</button>
+      </div>
+    </section>
+
+    <!-- ========== FINAL ========== -->
+    <section id="pantalla-final" class="pantalla">
+      <div class="tarjeta final">
+        <p class="gran-emoji" aria-hidden="true">🎉</p>
+        <h2>¡Ganaste!</h2>
+        <p class="subtitulo">Completaste los 4 niveles.</p>
+        <p class="puntaje" id="puntaje"></p>
+        <p class="frase-final" id="frase-final"></p>
+      </div>
+
+      <div class="tarjeta">
+        <h3>Tus preguntas y respuestas</h3>
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Nivel</th>
+              <th>Pregunta</th>
+              <th>Tu respuesta</th>
+              <th>Respuesta correcta</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-resultados"></tbody>
+        </table>
+      </div>
+
+      <div class="tarjeta">
+        <h3>Lo que aprendiste</h3>
+        <ul class="repaso" id="repaso"></ul>
+        <p class="nota">Nota: la relación entre las leyes de Newton y la arquitectura de software es una analogía para entender mejor; las leyes físicas no describen literalmente cómo funcionan los programas.</p>
+        <button class="btn principal grande" id="btn-repetir">Jugar de nuevo</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="confeti" id="confeti" aria-hidden="true"></div>
+
+  <script>
+'use strict';
+
+/* =====================================================================
+   MECÁNICA EN EL DÍA A DÍA
+   Juego de 4 niveles. Cada nivel tiene:
+     1) un texto corto,
+     2) una actividad para probar,
+     3) una pregunta fácil (si te equivocas, te damos una pista).
+   No se puede perder.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   Utilidades
+   --------------------------------------------------------------------- */
+const $ = (selector, raiz = document) => raiz.querySelector(selector);
+const limitar = (n, min, max) => Math.min(max, Math.max(min, n));
+const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Ejecuta una función en cada cuadro de animación. Devuelve una función para detenerla.
+function bucle(funcion) {
+  let id = 0;
+  let activo = true;
+  let ultimo = performance.now();
+  function paso(ahora) {
+    if (!activo) return;
+    const dt = limitar((ahora - ultimo) / 1000, 0, 0.05);
+    ultimo = ahora;
+    funcion(dt, ahora / 1000);
+    id = requestAnimationFrame(paso);
+  }
+  id = requestAnimationFrame(paso);
+  return () => { activo = false; cancelAnimationFrame(id); };
+}
+
+/* ---------------------------------------------------------------------
+   NIVEL 1 — Inercia (el bus que frena)
+   --------------------------------------------------------------------- */
+function montarNivel1(escenario, controles, interactuo) {
+  escenario.innerHTML = `
+    <svg viewBox="0 0 600 260" role="img" aria-label="Un bus con un pasajero de pie. El bus arranca y frena.">
+      <rect width="600" height="260" fill="#cfe8ff"/>
+      <g fill="#b8c7d9">
+        <rect x="20" y="95" width="70" height="100"/>
+        <rect x="105" y="60" width="55" height="135"/>
+        <rect x="470" y="80" width="80" height="115"/>
+        <rect x="560" y="110" width="40" height="85"/>
+      </g>
+      <rect id="calle" x="0" y="190" width="600" height="70" fill="#5b6470"/>
+      <g id="rayas" fill="#f1f3f5"></g>
+
+      <!-- Bus -->
+      <rect x="120" y="95" width="320" height="95" rx="14" fill="#f4b400"/>
+      <g fill="#dff1ff" stroke="#c88f00" stroke-width="2">
+        <rect x="135" y="108" width="55" height="38" rx="5"/>
+        <rect x="200" y="108" width="55" height="38" rx="5"/>
+        <rect x="265" y="108" width="55" height="38" rx="5"/>
+        <rect x="330" y="108" width="55" height="38" rx="5"/>
+        <rect x="395" y="108" width="34" height="50" rx="5"/>
+      </g>
+      <rect x="120" y="178" width="320" height="6" fill="#c88f00"/>
+      <rect x="436" y="160" width="8" height="14" rx="2" fill="#fff3bf"/>
+
+      <!-- Pasajero: gira alrededor de los pies (290,178) -->
+      <g id="pasajero">
+        <rect x="282" y="140" width="16" height="38" rx="6" fill="#364fc7"/>
+        <circle cx="290" cy="128" r="11" fill="#ffd8a8"/>
+      </g>
+
+      <circle cx="190" cy="192" r="20" fill="#222"/><circle cx="190" cy="192" r="8" fill="#888"/>
+      <circle cx="370" cy="192" r="20" fill="#222"/><circle cx="370" cy="192" r="8" fill="#888"/>
+
+      <text id="etq" x="290" y="80" text-anchor="middle" font-size="24" font-weight="700"
+            fill="#c92a2a" stroke="#fff" stroke-width="5" paint-order="stroke" opacity="0">
+        El cuerpo sigue hacia adelante →
+      </text>
+
+      <!-- Medidor de velocidad -->
+      <text x="20" y="26" font-size="18" font-weight="700" fill="#1f2a3c">Velocidad</text>
+      <rect x="20" y="33" width="160" height="12" rx="6" fill="#fff" opacity="0.85"/>
+      <rect id="vbarra" x="20" y="33" width="0" height="12" rx="6" fill="#2b9a57"/>
+
+      <g id="lluvia" stroke="#4dabf7" stroke-width="2" opacity="0"></g>
+    </svg>`;
+
+  controles.innerHTML = `
+    <button class="btn" id="b-arrancar">▶ Arrancar</button>
+    <button class="btn alerta" id="b-frenar">🛑 Frenar</button>
+    <div class="grupo" role="group" aria-label="Tipo de piso">
+      <button class="chip activo" data-piso="seco" aria-pressed="true">☀️ Piso seco</button>
+      <button class="chip" data-piso="mojado" aria-pressed="false">🌧️ Piso mojado</button>
+    </div>
+    <p class="mini" id="msg">1) Toca «Arrancar». 2) Cuando el bus vaya rápido, toca «Frenar» y mira al pasajero.</p>`;
+
+  const rayas = $('#rayas', escenario);
+  const pasajero = $('#pasajero', escenario);
+  const barra = $('#vbarra', escenario);
+  const etiqueta = $('#etq', escenario);
+  const calle = $('#calle', escenario);
+  const lluvia = $('#lluvia', escenario);
+  const msg = $('#msg', controles);
+
+  // Rayas de la calle (se desplazan para dar sensación de movimiento)
+  for (let i = 0; i < 9; i++) {
+    rayas.insertAdjacentHTML('beforeend', `<rect x="${i * 80}" y="224" width="40" height="6" rx="3"/>`);
+  }
+  // Gotas de lluvia
+  for (let i = 0; i < 26; i++) {
+    const x = 10 + i * 23;
+    const y = (i * 53) % 200;
+    lluvia.insertAdjacentHTML('beforeend', `<line x1="${x}" y1="${y}" x2="${x - 6}" y2="${y + 16}"/>`);
+  }
+
+  const V_MAX = 240;                       // velocidad máxima (px/s)
+  const ACELERACION = 90;                  // al arrancar
+  const FRENADO = { seco: 240, mojado: 80 }; // con piso mojado frena más lento
+  let v = 0, modo = 'parado', piso = 'seco', angulo = 0, desplazamiento = 0;
+
+  $('#b-arrancar', controles).addEventListener('click', () => {
+    if (modo === 'frenando' && v > 0) return;
+    modo = 'andando';
+    msg.textContent = 'Mira al pasajero: al arrancar se inclina un poco hacia atrás. Ahora espera a que vaya rápido y toca «Frenar».';
+  });
+
+  $('#b-frenar', controles).addEventListener('click', () => {
+    if (v < 60) {
+      msg.textContent = 'Primero toca «Arrancar» y espera a que el bus vaya más rápido.';
+      return;
+    }
+    modo = 'frenando';
+    msg.textContent = 'El bus frena, pero el pasajero sigue yendo hacia adelante. Prueba también con piso mojado.';
+    interactuo();
+  });
+
+  controles.querySelectorAll('.chip').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      piso = boton.dataset.piso;
+      controles.querySelectorAll('.chip').forEach((b) => {
+        const activo = b === boton;
+        b.classList.toggle('activo', activo);
+        b.setAttribute('aria-pressed', String(activo));
+      });
+      calle.setAttribute('fill', piso === 'mojado' ? '#3d4a5c' : '#5b6470');
+      lluvia.setAttribute('opacity', piso === 'mojado' ? '0.7' : '0');
+      if (piso === 'mojado') msg.textContent = 'Con piso mojado hay menos fricción: el bus tarda más en detenerse.';
+    });
+  });
+
+  return bucle((dt) => {
+    let a = 0; // aceleración actual
+    if (modo === 'andando' && v < V_MAX) a = ACELERACION;
+    else if (modo === 'frenando') a = -FRENADO[piso];
+
+    v = limitar(v + a * dt, 0, V_MAX);
+    if (modo === 'frenando' && v === 0) modo = 'parado';
+
+    desplazamiento = (desplazamiento + v * dt) % 80;
+    // El pasajero se inclina al revés de la aceleración (inercia)
+    const objetivo = -a * 0.14;
+    angulo += (objetivo - angulo) * Math.min(1, dt * 10);
+
+    rayas.setAttribute('transform', `translate(${(-desplazamiento).toFixed(1)} 0)`);
+    pasajero.setAttribute('transform', `rotate(${angulo.toFixed(2)} 290 178)`);
+    barra.setAttribute('width', ((v / V_MAX) * 160).toFixed(1));
+    etiqueta.setAttribute('opacity', angulo > 9 ? '1' : '0');
+  });
+}
+
+/* ---------------------------------------------------------------------
+   NIVEL 2 — F = m·a (el carrito del supermercado)
+   --------------------------------------------------------------------- */
+function montarNivel2(escenario, controles, interactuo) {
+  const X0 = 130, X_MAX = 515;         // posición inicial y límite de la pista
+  const ESCALA = 50;                    // a = F / m * ESCALA
+  const ROZAMIENTO = 80;                // frena el carrito después del empujón
+  const T_EMPUJE = 0.8;                 // segundos que dura el empujón
+  const PISOS = [125, 250];             // y del suelo de cada carril
+
+  const carrito = (lleno) => `
+    ${lleno ? `
+      <rect x="8" y="-82" width="20" height="22" rx="2" fill="#fa5252"/>
+      <rect x="30" y="-92" width="22" height="32" rx="2" fill="#fab005"/>
+      <rect x="54" y="-80" width="18" height="20" rx="2" fill="#40c057"/>` : ''}
+    <path d="M0 -60 H80 L70 -20 H10 Z" fill="#e9ecef" stroke="#495057" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M0 -60 L-16 -78 H-28" fill="none" stroke="#495057" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="22" cy="-8" r="8" fill="#343a40"/>
+    <circle cx="62" cy="-8" r="8" fill="#343a40"/>`;
+
+  const flecha = (id) => `
+    <g id="${id}">
+      <rect id="${id}r" y="-3" height="6" fill="#e03131"/>
+      <polygon points="0,-9 14,0 0,9" fill="#e03131"/>
+      <text id="${id}t" x="14" y="-14" text-anchor="end" font-size="18" font-weight="700" fill="#e03131"
+            stroke="#fff" stroke-width="4" paint-order="stroke"></text>
+    </g>`;
+
+  escenario.innerHTML = `
+    <svg viewBox="0 0 600 275" role="img" aria-label="Dos carritos de supermercado, uno vacío y otro lleno, reciben el mismo empujón.">
+      <rect width="600" height="275" fill="#eef3fa"/>
+      <rect x="0" y="${PISOS[0]}" width="600" height="6" fill="#adb5bd"/>
+      <rect x="0" y="${PISOS[1]}" width="600" height="6" fill="#adb5bd"/>
+      <line x1="${X0}" y1="55" x2="${X0}" y2="262" stroke="#868e96" stroke-width="2" stroke-dasharray="6 6"/>
+      <text x="${X0 + 6}" y="270" font-size="16" fill="#5b6b82">Salida</text>
+      <text x="590" y="30" text-anchor="end" font-size="21" font-weight="700" fill="#1f2a3c">Carrito vacío (liviano)</text>
+      <text x="590" y="150" text-anchor="end" font-size="21" font-weight="700" fill="#1f2a3c">Carrito lleno (pesado)</text>
+      <g id="c1" transform="translate(${X0} ${PISOS[0]})">${carrito(false)}</g>
+      <g id="c2" transform="translate(${X0} ${PISOS[1]})">${carrito(true)}</g>
+      ${flecha('f1')}
+      ${flecha('f2')}
+    </svg>`;
+
+  controles.innerHTML = `
+    <label class="deslizador">
+      <span>Fuerza del empujón: <output id="fval">3</output></span>
+      <input type="range" id="fuerza" min="1" max="5" step="1" value="3">
+    </label>
+    <button class="btn" id="b-empujar">👉 Empujar los dos</button>
+    <button class="btn" id="b-reset">↺ Reiniciar</button>
+    <p class="mini" id="msg">Elige la fuerza y toca «Empujar». ¡Los dos carritos reciben exactamente la misma fuerza!</p>`;
+
+  const carros = [
+    { g: $('#c1', escenario), f: 'f1', piso: PISOS[0], masa: 1, x: X0, v: 0 },
+    { g: $('#c2', escenario), f: 'f2', piso: PISOS[1], masa: 3, x: X0, v: 0 },
+  ];
+  const slider = $('#fuerza', controles);
+  const salida = $('#fval', controles);
+  const botonEmpujar = $('#b-empujar', controles);
+  const msg = $('#msg', controles);
+  let fase = 'listo'; // listo | empujando | deslizando | fin
+  let t = 0;
+
+  function dibujar() {
+    const F = Number(slider.value);
+    const largo = 12 * F + 8;
+    const verFlechas = fase === 'listo' || fase === 'empujando';
+    carros.forEach((c) => {
+      c.g.setAttribute('transform', `translate(${c.x.toFixed(1)} ${c.piso})`);
+      const flechaG = $('#' + c.f, escenario);
+      flechaG.setAttribute('transform', `translate(${(c.x - 46).toFixed(1)} ${c.piso - 78})`);
+      flechaG.setAttribute('opacity', verFlechas ? '1' : '0');
+      $('#' + c.f + 'r', escenario).setAttribute('x', String(-largo));
+      $('#' + c.f + 'r', escenario).setAttribute('width', String(largo));
+      $('#' + c.f + 't', escenario).textContent = 'Fuerza ' + F;
+    });
+  }
+
+  function reiniciar() {
+    fase = 'listo'; t = 0;
+    carros.forEach((c) => { c.x = X0; c.v = 0; });
+    slider.disabled = false;
+    botonEmpujar.disabled = false;
+    msg.textContent = 'Elige la fuerza y toca «Empujar». ¡Los dos carritos reciben exactamente la misma fuerza!';
+    dibujar();
+  }
+
+  slider.addEventListener('input', () => { salida.textContent = slider.value; dibujar(); });
+  $('#b-reset', controles).addEventListener('click', reiniciar);
+  botonEmpujar.addEventListener('click', () => {
+    if (fase !== 'listo') return;
+    fase = 'empujando'; t = 0;
+    slider.disabled = true;
+    botonEmpujar.disabled = true;
+    msg.textContent = 'Empujando… mira cuál arranca más rápido.';
+    interactuo();
+  });
+
+  dibujar();
+
+  return bucle((dt) => {
+    if (fase === 'empujando') {
+      const F = Number(slider.value);
+      carros.forEach((c) => {
+        const a = (F / c.masa) * ESCALA;  // Segunda ley: a = F / m
+        c.v += a * dt;
+        c.x = Math.min(X_MAX, c.x + c.v * dt);
+      });
+      t += dt;
+      if (t >= T_EMPUJE) fase = 'deslizando';
+      dibujar();
+    } else if (fase === 'deslizando') {
+      carros.forEach((c) => {
+        c.v = Math.max(0, c.v - ROZAMIENTO * dt);
+        c.x = Math.min(X_MAX, c.x + c.v * dt);
+        if (c.x >= X_MAX) c.v = 0;
+      });
+      if (carros.every((c) => c.v === 0)) {
+        fase = 'fin';
+        msg.textContent = 'Con la misma fuerza, el carrito vacío llegó mucho más lejos que el lleno. Puedes cambiar la fuerza y repetir.';
+      }
+      dibujar();
+    }
+  });
+}
+
+/* ---------------------------------------------------------------------
+   NIVEL 3 — Acción y reacción (el bote)
+   --------------------------------------------------------------------- */
+function montarNivel3(escenario, controles, interactuo) {
+  escenario.innerHTML = `
+    <svg viewBox="0 0 600 280" role="img" aria-label="Una persona salta de un bote a un muelle y el bote se aleja hacia atrás.">
+      <rect width="600" height="280" fill="#d0ebff"/>
+      <circle cx="528" cy="48" r="26" fill="#ffe066"/>
+      <rect x="452" y="185" width="14" height="95" fill="#7f5539"/>
+      <rect x="560" y="185" width="14" height="95" fill="#7f5539"/>
+
+      <g id="bote">
+        <path d="M250 175 H395 L372 214 H275 Z" fill="#e8590c"/>
+        <path d="M258 186 H387 L382 194 H263 Z" fill="#fff" opacity="0.85"/>
+      </g>
+
+      <rect x="0" y="205" width="600" height="75" fill="#339af0" opacity="0.78"/>
+      <path d="M0 212 Q25 204 50 212 T100 212 T150 212 T200 212 T250 212 T300 212 T350 212 T400 212 T450 212 T500 212 T550 212 T600 212"
+            fill="none" stroke="#fff" stroke-width="3" opacity="0.6"/>
+      <rect x="440" y="170" width="160" height="16" rx="3" fill="#a47148"/>
+
+      <!-- Flechas de acción (rojo) y reacción (azul) -->
+      <g id="fAccion" opacity="0">
+        <rect x="0" y="-3" width="34" height="6" fill="#e03131"/>
+        <polygon points="34,-9 48,0 34,9" fill="#e03131"/>
+        <text x="0" y="-14" font-size="19" font-weight="700" fill="#e03131" stroke="#fff" stroke-width="5" paint-order="stroke">Acción</text>
+      </g>
+      <g id="fReaccion" opacity="0">
+        <rect x="-34" y="-3" width="34" height="6" fill="#1971c2"/>
+        <polygon points="-34,-9 -48,0 -34,9" fill="#1971c2"/>
+        <text x="0" y="-14" text-anchor="end" font-size="19" font-weight="700" fill="#1971c2" stroke="#fff" stroke-width="5" paint-order="stroke">Reacción</text>
+      </g>
+
+      <!-- Persona: el origen (0,0) son sus pies -->
+      <g id="persona">
+        <circle cx="0" cy="-48" r="9" fill="#ffd8a8"/>
+        <rect x="-7" y="-39" width="14" height="24" rx="5" fill="#364fc7"/>
+        <line x1="-4" y1="-15" x2="-7" y2="0" stroke="#212529" stroke-width="5" stroke-linecap="round"/>
+        <line x1="4" y1="-15" x2="7" y2="0" stroke="#212529" stroke-width="5" stroke-linecap="round"/>
+      </g>
+    </svg>`;
+
+  controles.innerHTML = `
+    <button class="btn" id="b-saltar">🦘 Saltar al muelle</button>
+    <button class="btn" id="b-reset">↺ Volver a intentar</button>
+    <p class="mini" id="msg">Toca «Saltar» y mira qué hace el bote.</p>`;
+
+  const bote = $('#bote', escenario);
+  const persona = $('#persona', escenario);
+  const fAccion = $('#fAccion', escenario);
+  const fReaccion = $('#fReaccion', escenario);
+  const botonSaltar = $('#b-saltar', controles);
+  const msg = $('#msg', controles);
+
+  const T_VUELO = 0.9;
+  let fase = 'listo'; // listo | saltando | fin
+  let t = 0;
+
+  botonSaltar.addEventListener('click', () => {
+    if (fase !== 'listo') return;
+    fase = 'saltando'; t = 0;
+    botonSaltar.disabled = true;
+    msg.textContent = 'Empujas el bote hacia atrás… y el bote te empuja a ti hacia adelante.';
+    interactuo();
+  });
+  $('#b-reset', controles).addEventListener('click', () => {
+    fase = 'listo'; t = 0;
+    botonSaltar.disabled = false;
+    msg.textContent = 'Toca «Saltar» y mira qué hace el bote.';
+  });
+
+  return bucle((dt, tiempo) => {
+    if (fase === 'saltando') {
+      t += dt;
+      if (t >= 3.2) { fase = 'fin'; msg.textContent = 'Al saltar hacia adelante, el bote se fue hacia atrás. ¡Acción y reacción!'; }
+    }
+    const balanceo = Math.sin(tiempo * 2.2) * 1.6; // el bote se mece suavemente
+    const bx = fase === 'listo' ? 0 : -70 * (1 - Math.exp(-1.5 * t));
+    bote.setAttribute('transform', `translate(${bx.toFixed(1)} ${balanceo.toFixed(1)})`);
+
+    let px, py;
+    if (fase === 'listo') {
+      px = 360; py = 175 + balanceo;
+    } else {
+      const s = limitar(t / T_VUELO, 0, 1);
+      px = 360 + 130 * s;
+      py = 175 - 5 * s - 240 * s * (1 - s); // arco del salto, cae sobre el muelle (y = 170)
+    }
+    persona.setAttribute('transform', `translate(${px.toFixed(1)} ${py.toFixed(1)})`);
+
+    // Las flechas aparecen un momento al saltar
+    const visible = fase === 'saltando' && t < 1.4 ? limitar((1.4 - t) / 0.4, 0, 1) : 0;
+    fAccion.setAttribute('opacity', visible.toFixed(2));
+    fReaccion.setAttribute('opacity', visible.toFixed(2));
+    fAccion.setAttribute('transform', `translate(${(px + 12).toFixed(1)} ${(py - 30).toFixed(1)})`);
+    fReaccion.setAttribute('transform', `translate(${(bx + 340).toFixed(1)} ${(150 + balanceo).toFixed(1)})`);
+  });
+}
+
+/* ---------------------------------------------------------------------
+   NIVEL 4 — Mecánica en el software (la lista que se desliza)
+   Aquí la física sí se programa: la lista tiene velocidad (inercia)
+   y una fricción que la va frenando.
+   --------------------------------------------------------------------- */
+function montarNivel4(escenario, controles, interactuo) {
+  const NOMBRES = ['Ana', 'Beto', 'Carla', 'Diego', 'Elena', 'Fabián', 'Gloria', 'Hugo', 'Isabel', 'Jorge',
+                   'Karen', 'Luis', 'María', 'Nico', 'Olga', 'Pablo', 'Quique', 'Rosa', 'Sofía', 'Tomás'];
+  const AVATARES = ['😀', '🙂', '😎', '🤓', '😄', '🥳', '😊', '🤠'];
+  let filas = '';
+  for (let i = 0; i < 40; i++) {
+    filas += `<div class="item"><span class="avatar">${AVATARES[i % AVATARES.length]}</span>
+      <div><b>${NOMBRES[i % NOMBRES.length]}</b><small>Mensaje n.º ${i + 1}</small></div></div>`;
+  }
+
+  escenario.innerHTML = `
+    <div class="escena-telefono">
+      <div class="telefono">
+        <div class="lista-ventana" id="ventana"><div class="lista" id="lista">${filas}</div></div>
+      </div>
+      <div class="medidor">
+        Velocidad de la lista
+        <div class="fondo-v"><div id="vbar"></div></div>
+        <p>Desliza la lista con el dedo (o el mouse) y suéltala.</p>
+      </div>
+    </div>`;
+
+  controles.innerHTML = `
+    <button class="btn" id="b-empujon">👆 Dar un empujón</button>
+    <label class="deslizador">
+      <span>Fricción: <output id="fval">media</output></span>
+      <input type="range" id="friccion" min="1" max="5" step="1" value="3">
+    </label>
+    <p class="mini" id="msg">Prueba con fricción baja y con fricción alta.</p>`;
+
+  const ventana = $('#ventana', escenario);
+  const lista = $('#lista', escenario);
+  const barra = $('#vbar', escenario);
+  const slider = $('#friccion', controles);
+  const salida = $('#fval', controles);
+  const msg = $('#msg', controles);
+
+  const NIVELES_FRICCION = [0.8, 1.8, 3, 5, 9];
+  const ETIQUETAS = ['muy baja', 'baja', 'media', 'alta', 'muy alta'];
+  let k = NIVELES_FRICCION[2];          // fricción: qué tan rápido se frena
+  let y = 0, v = 0;                     // posición y velocidad de la lista (px, px/s)
+  let arrastrando = false, ultimoY = 0, ultimoT = 0;
+
+  const alturaLista = () => lista.scrollHeight;
+  const minY = () => -(alturaLista() - ventana.clientHeight);
+
+  slider.addEventListener('input', () => {
+    const i = Number(slider.value) - 1;
+    k = NIVELES_FRICCION[i];
+    salida.textContent = ETIQUETAS[i];
+    msg.textContent = i <= 1
+      ? 'Poca fricción: la lista sigue deslizándose mucho tiempo.'
+      : i >= 3 ? 'Mucha fricción: la lista se frena casi enseguida.' : 'Fricción media: así se siente en tu celular.';
+  });
+
+  $('#b-empujon', controles).addEventListener('click', () => {
+    v = (y > minY() / 2 ? -1 : 1) * 2200;
+    interactuo();
+  });
+
+  ventana.addEventListener('pointerdown', (e) => {
+    arrastrando = true; v = 0;
+    ultimoY = e.clientY; ultimoT = performance.now();
+    ventana.setPointerCapture(e.pointerId);
+  });
+  ventana.addEventListener('pointermove', (e) => {
+    if (!arrastrando) return;
+    const ahora = performance.now();
+    const dy = e.clientY - ultimoY;
+    const dt = (ahora - ultimoT) / 1000;
+    y = limitar(y + dy, minY(), 0);
+    if (dt > 0.004) v = 0.6 * v + 0.4 * (dy / dt); // velocidad suavizada del dedo
+    ultimoY = e.clientY; ultimoT = ahora;
+  });
+  const soltar = () => {
+    if (!arrastrando) return;
+    arrastrando = false;
+    if (performance.now() - ultimoT > 100) v = 0; // el dedo estaba quieto al soltar
+    if (Math.abs(v) > 80) interactuo();
+  };
+  ventana.addEventListener('pointerup', soltar);
+  ventana.addEventListener('pointercancel', soltar);
+
+  return bucle((dt) => {
+    if (!arrastrando) {
+      y += v * dt;                    // inercia: sigue moviéndose con su velocidad
+      v *= Math.exp(-k * dt);         // fricción: la velocidad se va reduciendo
+      if (Math.abs(v) < 5) v = 0;
+      const limite = minY();
+      if (y > 0) { y = 0; v = 0; }
+      if (y < limite) { y = limite; v = 0; }
+    }
+    lista.style.transform = `translateY(${y.toFixed(1)}px)`;
+    barra.style.width = (limitar(Math.abs(v) / 2500, 0, 1) * 100).toFixed(0) + '%';
+  });
+}
+
+/* ---------------------------------------------------------------------
+   Datos de los niveles (texto, pregunta, pista y repaso)
+   --------------------------------------------------------------------- */
+const NIVELES = [
+  {
+    titulo: 'El bus que frena',
+    tema: 'Primera ley de Newton: inercia',
+    texto: 'Los objetos siguen haciendo lo que ya hacían hasta que algo los cambia. Si un bus frena, los pasajeros siguen yendo hacia adelante.',
+    montar: montarNivel1,
+    pregunta: {
+      texto: 'Cuando el bus frena de golpe, ¿hacia dónde se van los pasajeros?',
+      opciones: ['Hacia atrás', 'Hacia adelante', 'Se quedan quietos'],
+      correcta: 1,
+      pista: 'Fíjate en lo que acabas de ver al tocar «Frenar».',
+    },
+    repaso: 'Inercia: los objetos siguen haciendo lo que hacían hasta que una fuerza los cambia (por eso el pasajero se va hacia adelante cuando el bus frena).',
+  },
+  {
+    titulo: 'El carrito del supermercado',
+    tema: 'Segunda ley de Newton: F = m · a',
+    texto: 'Entre más pesado es algo, más fuerza se necesita para moverlo. Con la misma fuerza, lo liviano acelera más.',
+    montar: montarNivel2,
+    pregunta: {
+      texto: '¿Qué carrito es más fácil de empujar?',
+      opciones: ['El vacío', 'El lleno', 'Los dos igual'],
+      correcta: 0,
+      pista: 'Piensa en cuál te cansaría menos al empujarlo.',
+    },
+    repaso: 'F = m · a: con la misma fuerza, lo liviano acelera más que lo pesado (el carrito vacío arranca más rápido).',
+  },
+  {
+    titulo: 'El salto del bote',
+    tema: 'Tercera ley de Newton: acción y reacción',
+    texto: 'Cuando empujas algo, eso te empuja a ti en sentido contrario.',
+    montar: montarNivel3,
+    pregunta: {
+      texto: 'Al saltar del bote hacia el muelle, ¿qué le pasa al bote?',
+      opciones: ['No se mueve', 'Se mueve hacia adelante', 'Se mueve hacia atrás'],
+      correcta: 2,
+      pista: 'Mira hacia dónde se fue el bote en la animación.',
+    },
+    repaso: 'Acción y reacción: si empujas algo, eso te empuja a ti en sentido contrario (tú vas al muelle y el bote se va hacia atrás).',
+  },
+  {
+    titulo: 'La lista del celular',
+    tema: 'La mecánica dentro del software',
+    texto: 'Las apps usan física: cuando deslizas una lista y sueltas, sigue moviéndose y se frena poco a poco, como una pelota que rueda.',
+    montar: montarNivel4,
+    pregunta: {
+      texto: 'Si deslizas la lista y sueltas el dedo, ¿qué hace?',
+      opciones: ['Se detiene al instante', 'Sigue un poco y se frena', 'Se mueve para siempre'],
+      correcta: 1,
+      pista: 'Piensa en cómo se siente al usar tu propio celular.',
+    },
+    repaso: 'En el software, la inercia y la fricción se programan con fórmulas: por eso la lista sigue un poco y se frena sola.',
+  },
+];
+
+/* ---------------------------------------------------------------------
+   Control del juego
+   --------------------------------------------------------------------- */
+let nivelActual = 0;
+let resultados = [];        // un resultado por nivel: { primera, aLaPrimera }
+let detenerNivel = null;    // detiene la animación del nivel actual
+let yaInteractuo = false;
+let respondido = false;
+
+function mostrarPantalla(id) {
+  document.querySelectorAll('.pantalla').forEach((p) => p.classList.toggle('activa', p.id === id));
+  $('#barra').hidden = id === 'pantalla-inicio';
+  window.scrollTo({ top: 0 });
+}
+
+function dibujarProgreso(completados, actual) {
+  const contenedor = $('#progreso');
+  contenedor.innerHTML = '';
+  NIVELES.forEach((_, i) => {
+    const punto = document.createElement('span');
+    punto.className = 'punto' + (i < completados ? ' hecho' : '') + (i === actual ? ' actual' : '');
+    contenedor.appendChild(punto);
+  });
+}
+
+function iniciarJuego() {
+  resultados = [];
+  cargarNivel(0);
+}
+
+function cargarNivel(indice) {
+  if (detenerNivel) detenerNivel();
+  nivelActual = indice;
+  yaInteractuo = false;
+  respondido = false;
+  const nivel = NIVELES[indice];
+
+  $('#nivel-etiqueta').textContent = `Nivel ${indice + 1} de ${NIVELES.length}`;
+  $('#nivel-titulo').textContent = nivel.titulo;
+  $('#nivel-tema').textContent = nivel.tema;
+  $('#nivel-texto').textContent = nivel.texto;
+  $('#escenario').innerHTML = '';
+  $('#controles').innerHTML = '';
+  $('#bloque-pregunta').hidden = true;
+  $('#btn-pregunta').disabled = true;
+  $('#btn-pregunta').hidden = false;
+  $('#aviso').textContent = '👆 Prueba la actividad para poder pasar a la pregunta.';
+
+  dibujarProgreso(indice, indice);
+  mostrarPantalla('pantalla-nivel');
+  detenerNivel = nivel.montar($('#escenario'), $('#controles'), alInteractuar);
+}
+
+// Se llama cuando el jugador ya probó la actividad
+function alInteractuar() {
+  if (yaInteractuo) return;
+  yaInteractuo = true;
+  $('#btn-pregunta').disabled = false;
+  $('#aviso').textContent = '✅ ¡Muy bien! Ya puedes ir a la pregunta (y seguir probando si quieres).';
+}
+
+function mostrarPregunta() {
+  const p = NIVELES[nivelActual].pregunta;
+  respondido = false;
+  resultados[nivelActual] = { primera: null, aLaPrimera: false };
+
+  $('#pregunta-texto').textContent = p.texto;
+  $('#mensaje').innerHTML = '';
+  $('#btn-siguiente').hidden = true;
+  $('#btn-siguiente').textContent = nivelActual === NIVELES.length - 1 ? 'Ver mis resultados 🏁' : 'Siguiente nivel →';
+  $('#btn-pregunta').hidden = true;
+
+  const contenedor = $('#opciones');
+  contenedor.innerHTML = '';
+  p.opciones.forEach((texto, i) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'opcion';
+    boton.textContent = texto;
+    boton.addEventListener('click', () => responder(i, boton));
+    contenedor.appendChild(boton);
+  });
+
+  $('#bloque-pregunta').hidden = false;
+  $('#bloque-pregunta').scrollIntoView({ behavior: menosMovimiento ? 'auto' : 'smooth', block: 'center' });
+}
+
+function responder(indice, boton) {
+  if (respondido) return;
+  const nivel = NIVELES[nivelActual];
+  const p = nivel.pregunta;
+  const resultado = resultados[nivelActual];
+  const esPrimera = resultado.primera === null;
+  if (esPrimera) resultado.primera = p.opciones[indice];
+
+  if (indice === p.correcta) {
+    respondido = true;
+    resultado.aLaPrimera = esPrimera;
+    boton.classList.add('bien');
+    document.querySelectorAll('#opciones .opcion').forEach((b) => { b.disabled = true; });
+    $('#mensaje').innerHTML = `<div class="caja ok"><b>¡Correcto! 🎉</b><br>${nivel.repaso}</div>`;
+    $('#btn-siguiente').hidden = false;
+    $('#btn-siguiente').focus({ preventScroll: true });
+  } else {
+    boton.classList.add('mal');
+    boton.disabled = true;
+    $('#mensaje').innerHTML = `<div class="caja pista"><b>💡 Pista:</b> ${p.pista}<br>¡Inténtalo otra vez!</div>`;
+  }
+}
+
+function siguiente() {
+  if (nivelActual < NIVELES.length - 1) cargarNivel(nivelActual + 1);
+  else mostrarFinal();
+}
+
+function mostrarFinal() {
+  if (detenerNivel) { detenerNivel(); detenerNivel = null; }
+  const aciertos = resultados.filter((r) => r.aLaPrimera).length;
+  const total = NIVELES.length;
+
+  $('#puntaje').textContent = `Respondiste bien a la primera ${aciertos} de ${total}`;
+  $('#frase-final').textContent =
+    aciertos === total ? '¡Perfecto! No necesitaste ninguna pista.'
+      : aciertos >= total / 2 ? '¡Muy bien! Las pistas te ayudaron a llegar hasta aquí.'
+        : '¡Lo importante es que aprendiste y llegaste al final!';
+
+  const cuerpo = $('#tabla-resultados');
+  cuerpo.innerHTML = '';
+  NIVELES.forEach((nivel, i) => {
+    const r = resultados[i];
+    const fila = document.createElement('tr');
+    const celdas = [
+      ['Nivel', `${i + 1}. ${nivel.titulo}`],
+      ['Pregunta', nivel.pregunta.texto],
+      ['Tu respuesta', r.primera],
+      ['Respuesta correcta', nivel.pregunta.opciones[nivel.pregunta.correcta]],
+    ];
+    celdas.forEach(([etiqueta, valor]) => {
+      const td = document.createElement('td');
+      td.dataset.label = etiqueta;
+      td.textContent = valor;
+      fila.appendChild(td);
+    });
+    const tdResultado = document.createElement('td');
+    tdResultado.dataset.label = 'Resultado';
+    tdResultado.innerHTML = r.aLaPrimera
+      ? '<span class="insignia primera">✅ A la primera</span>'
+      : '<span class="insignia pista">💡 Con pista</span>';
+    fila.appendChild(tdResultado);
+    cuerpo.appendChild(fila);
+  });
+
+  const repaso = $('#repaso');
+  repaso.innerHTML = '';
+  NIVELES.forEach((nivel) => {
+    const li = document.createElement('li');
+    li.textContent = nivel.repaso;
+    repaso.appendChild(li);
+  });
+
+  dibujarProgreso(NIVELES.length, -1);
+  mostrarPantalla('pantalla-final');
+  lanzarConfeti();
+}
+
+function lanzarConfeti() {
+  if (menosMovimiento) return;
+  const caja = $('#confeti');
+  const colores = ['#ffb703', '#2f6fed', '#2b9a57', '#d64545', '#9c36b5'];
+  caja.innerHTML = '';
+  for (let i = 0; i < 50; i++) {
+    const pieza = document.createElement('span');
+    pieza.style.left = Math.random() * 100 + '%';
+    pieza.style.background = colores[i % colores.length];
+    pieza.style.animationDuration = 2.5 + Math.random() * 2.5 + 's';
+    pieza.style.animationDelay = Math.random() * 1.2 + 's';
+    caja.appendChild(pieza);
+  }
+  setTimeout(() => { caja.innerHTML = ''; }, 7000);
+}
+
+$('#btn-empezar').addEventListener('click', iniciarJuego);
+$('#btn-pregunta').addEventListener('click', mostrarPregunta);
+$('#btn-siguiente').addEventListener('click', siguiente);
+$('#btn-repetir').addEventListener('click', iniciarJuego);
+
+</script>
+</body>
+</html>
